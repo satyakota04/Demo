@@ -28,6 +28,17 @@ dependencies {
     implementation(libs.guava)
 }
 
+sourceSets {
+    main {
+        kotlin.srcDirs("app/src/main/kotlin")
+        resources.srcDirs("app/src/main/resources")
+    }
+    test {
+        kotlin.srcDirs("app/src/test/kotlin")
+        resources.srcDirs("app/src/test/resources")
+    }
+}
+
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
