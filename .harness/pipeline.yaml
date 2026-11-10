@@ -35,6 +35,7 @@ pipeline:
                     envVariables:
                       TI_V2: "1"
                       TI_COVERAGE_ENABLED: "1"
+                      HARNESS_AGENT_CONFIG: "@@logLevel: 4@@logConsole: true"
                     reports:
                       type: JUnit
                       spec:
