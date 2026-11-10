@@ -71,6 +71,10 @@ pipeline:
                       # `test` is finalizedBy jacocoTestReport; regenerate if the TI run skipped it.
                       [ -f build/reports/jacoco/test/jacocoTestReport.xml ] || ./gradlew --no-daemon test jacocoTestReport
 
+                      # diagnostics: JaCoCo overall counters (missed/covered) and per-file line hits
+                      grep -o '<counter type="LINE"[^>]*/>' build/reports/jacoco/test/jacocoTestReport.xml | tail -1 || true
+                      ls -la build/jacoco/ || true
+
                       hcli cov upload \
                         --file build/reports/jacoco/test/jacocoTestReport.xml
         failureStrategies:
