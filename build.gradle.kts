@@ -11,6 +11,9 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+
+    // JaCoCo coverage (XML report is picked up by hcli cov)
+    jacoco
 }
 
 repositories {
@@ -22,6 +25,7 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
 
+    testImplementation(kotlin("test-junit5"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // This dependency is used by the application.
@@ -54,4 +58,20 @@ application {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
 }
