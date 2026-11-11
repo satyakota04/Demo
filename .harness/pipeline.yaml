@@ -68,17 +68,16 @@ pipeline:
                       if [ -n "${HARNESS_TI_SERVICE_TOKEN:-}" ] && ! printf '%s' "$HARNESS_TI_SERVICE_TOKEN" | base64 -d >/dev/null 2>&1; then
                         export HARNESS_TI_SERVICE_TOKEN=$(printf '%s' "$HARNESS_TI_SERVICE_TOKEN" | base64 | tr -d '\n')
                       fi
-                      # No re-run: upload the per-test coverage the TI agent wrote during the (selective) run above.
-                      files=$(find "$HOME/.hcli/ti-agents" -name '*_tiRunner.json' 2>/dev/null || true)
-                      if [ -z "$files" ]; then
-                        echo "No *_tiRunner.json coverage produced; coverage-related files:"
-                        find "$HOME/.hcli/ti-agents" -ipath '*coverage*' 2>/dev/null | head -50
-                        exit 1
-                      fi
-                      echo "$files"
-                      args=()
-                      for f in $files; do args+=(--file "$f"); done
-                      hcli cov upload "${args[@]}"
+                      # No re-run: use the JaCoCo report the selective TI run above already generated
+                      # (`test` is finalizedBy jacocoTestReport). Regenerate from existing exec data only.
+                      R=build/reports/jacoco/test/jacocoTestReport.xml
+                      [ -f "$R" ] || ./gradlew --no-daemon jacocoTestReport -x test
+
+                      # diagnostics: overall LINE counter (missed/covered)
+                      grep -o '<counter type="LINE"[^>]*/>' "$R" | tail -1 || true
+                      ls -la build/jacoco/ || true
+
+                      hcli cov upload --file "$R"
         failureStrategies:
           - onFailure:
               errors:
