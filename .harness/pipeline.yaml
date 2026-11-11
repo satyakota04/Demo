@@ -68,8 +68,8 @@ pipeline:
                       if [ -n "${HARNESS_TI_SERVICE_TOKEN:-}" ] && ! printf '%s' "$HARNESS_TI_SERVICE_TOKEN" | base64 -d >/dev/null 2>&1; then
                         export HARNESS_TI_SERVICE_TOKEN=$(printf '%s' "$HARNESS_TI_SERVICE_TOKEN" | base64 | tr -d '\n')
                       fi
-                      # `test` is finalizedBy jacocoTestReport; regenerate if the TI run skipped it.
-                      [ -f build/reports/jacoco/test/jacocoTestReport.xml ] || ./gradlew --no-daemon test jacocoTestReport
+                      # Fresh run without the TI agent so JaCoCo records hits cleanly.
+                      ./gradlew --no-daemon clean test jacocoTestReport
 
                       # diagnostics: JaCoCo overall counters (missed/covered) and per-file line hits
                       grep -o '<counter type="LINE"[^>]*/>' build/reports/jacoco/test/jacocoTestReport.xml | tail -1 || true
